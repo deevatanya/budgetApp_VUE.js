@@ -49,29 +49,42 @@
 <script>
 export default {
   name: 'Form',
-  data: () => ({
-    formData: {
-      type: 'INCOME',
-      comment: '',
-      value: 0,
-    },
-    rules: {
-      type: [
-        { required: true, message: 'Please select type', trigger: 'blur' },
-      ],
-      comment: [
-        { required: true, message: 'Please input comment', trigger: 'change' },
-      ],
-      value: [
-        { required: true, message: 'Please input value', trigger: 'change' },
-        { type: 'number', message: 'Value must be a number', trigger: 'change' },
-      ],
-    },
-  }),
+  data() {
+    const checkValue = (rule, val, callback) => {
+      if (val === 0) {
+        callback(new Error('The value must not be 0'));
+      } else {
+        callback();
+      }
+    };
+    return {
+      formData: {
+        type: 'INCOME',
+        comment: '',
+        value: 0,
+      },
+      rules: {
+        type: [
+          { required: true, message: 'Please select type', trigger: 'blur' },
+        ],
+        comment: [
+          { required: true, message: 'Please input comment', trigger: 'change' },
+        ],
+        value: [
+          { required: true, message: 'Please input value', trigger: 'change' },
+          { type: 'number', message: 'Value must be a number', trigger: 'change' },
+          { validator: checkValue, trigger: 'change' },
+        ],
+      },
+    };
+  },
   methods: {
     onSubmit() {
       this.$refs.addItemForm.validate((valid) => {
         if (valid) {
+          if (this.formData.type === 'OUTCOME' || Math.sign(this.formData.value) === -1) {
+            this.formData.value *= -1;
+          }
           this.$emit('submitForm', { ...this.formData });
           this.$refs.addItemForm.resetFields();
         }

@@ -36,15 +36,20 @@ export default {
         id: 2,
       },
     },
+    storeList: {},
   }),
   computed: {
     totalBalance() {
       return Object.values(this.list).reduce((acc, item) => acc + item.value, 0);
     },
   },
+  mounted() {
+    this.storeList = Object.assign(this.list);
+  },
   methods: {
     onDeleteItem(id) {
       this.$delete(this.list, id);
+      this.$delete(this.storeList, id);
     },
     onFormSubmit(data) {
       const newObj = {
@@ -52,6 +57,7 @@ export default {
         id: String(Math.random()),
       };
       this.$set(this.list, newObj.id, newObj);
+      this.$set(this.storeList, newObj.id, newObj);
     },
   },
 };

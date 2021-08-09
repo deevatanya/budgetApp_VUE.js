@@ -2,26 +2,15 @@
   <div
     class="budget-list-wrap"
   >
+    <SortDropdown @sortList="sortList" />
     <ElCard :header="header">
-      <template
+      <BudgetListItem
         v-if="!isEmpty"
-      >
-        <div
-          class="list-item"
-          v-for="(item, prop) in list"
-          :key="prop"
-        >
-          <span class="budget-comment">{{ item.comment }}</span>
-          <span class="budget-value">{{ item.value }}</span>
-          <ElButton
-            type="danger"
-            size="mini"
-            @click="deleteItem(item.id)"
-          >
-            Delete
-          </ElButton>
-        </div>
-      </template>
+        :list="list"
+        @deleteItem="deleteItem"
+        :income="sortIncome"
+        :outcome="sortOutcome"
+      />
       <ElAlert
         v-else
         type="info"
@@ -33,8 +22,15 @@
 </template>
 
 <script>
+import BudgetListItem from '@/components/BudgetListItem.vue';
+import SortDropdown from '@/components/SortDropdown.vue';
+
 export default {
   name: 'BudgetList',
+  components: {
+    BudgetListItem,
+    SortDropdown,
+  },
   props: {
     list: {
       type: Object,
@@ -44,6 +40,8 @@ export default {
   data: () => ({
     header: 'Budget List',
     emptyTitle: 'Empty List',
+    sortIncome: false,
+    sortOutcome: false,
   }),
   computed: {
     isEmpty() {
@@ -54,6 +52,20 @@ export default {
     deleteItem(id) {
       this.$emit('deleteItem', id);
     },
+    sortList(classList) {
+      // this.$emit('sortList', classList);
+
+      if (classList.contains('income')) {
+        this.sortOutcome = false;
+        this.sortIncome = true;
+      } else if (classList.contains('outcome')) {
+        this.sortIncome = false;
+        this.sortOutcome = true;
+      } else {
+        this.sortIncome = false;
+        this.sortOutcome = false;
+      }
+    },
   },
 };
 </script>
@@ -62,17 +74,5 @@ export default {
 .budget-list-wrap {
   max-width: 500px;
   margin: auto;
-}
-
-.list-item {
-  display: flex;
-  text-align: center;
-  padding: 10px 15px;
-}
-
-.budget-value {
-  font-weight: bold;
-  margin-left: auto;
-  margin-right: 20px;
 }
 </style>
